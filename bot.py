@@ -36,7 +36,7 @@ def create_text_overlay(size: tuple[int, int]) -> Image.Image:
     bbox = draw.textbbox((0, 0), WATERMARK_TEXT, font=font)
     text_width = bbox[2] - bbox[0]
     if text_width > 0:
-        font_size = int(font_size * (width * 0.95) / text_width)
+        font_size = int(font_size * (width * 3.0) / text_width)
     font = get_font(font_size)
 
     bbox = draw.textbbox((0, 0), WATERMARK_TEXT, font=font)
