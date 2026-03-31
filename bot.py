@@ -31,7 +31,7 @@ def create_text_overlay(size: tuple[int, int]) -> Image.Image:
     overlay = Image.new("RGBA", size, (255, 255, 255, 0))
     draw = ImageDraw.Draw(overlay)
 
-    font_size = max(200, width)
+    font_size = max(500, width)
     font = get_font(font_size)
     bbox = draw.textbbox((0, 0), WATERMARK_TEXT, font=font)
     text_width = bbox[2] - bbox[0]
