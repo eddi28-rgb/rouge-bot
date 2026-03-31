@@ -1,3 +1,4 @@
+
 import os
 from pathlib import Path
 
@@ -7,8 +8,8 @@ from PIL import Image, ImageDraw, ImageFont
 from moviepy import CompositeVideoClip, ImageClip, VideoFileClip
 
 TOKEN = os.environ["DISCORD_TOKEN"]
-WATERMARK_TEXT = "Rouge:"
-WORKDIR = Path("temp_files")
+WATERMARK_TEXT = "discord.rouge"
+WORKDIR = Path("discord_bot/temp_files")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -31,14 +32,13 @@ def create_text_overlay(size: tuple[int, int]) -> Image.Image:
     overlay = Image.new("RGBA", size, (255, 255, 255, 0))
     draw = ImageDraw.Draw(overlay)
 
-    font_size = max(100, width // 3)
-    padding = max(10, width // 50)
+    font_size = max(150, width // 3)
     font = get_font(font_size)
 
     bbox = draw.textbbox((0, 0), WATERMARK_TEXT, font=font)
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
-    position = (width - text_width - padding, height - text_height - padding)
+    position = ((width - text_width) // 2, (height - text_height) // 2)
 
     draw.text(position, WATERMARK_TEXT, font=font, fill=(255, 255, 255, 255))
     return overlay
@@ -53,17 +53,21 @@ def add_watermark_image(input_path: Path, output_path: Path) -> None:
 
 def add_watermark_video(input_path: Path, output_path: Path) -> None:
     clip = VideoFileClip(str(input_path))
+
     try:
         overlay_image = create_text_overlay((clip.w, clip.h))
         overlay_path = output_path.with_name(f"{output_path.stem}_overlay.png")
         overlay_image.save(overlay_path)
+
         try:
             watermark = (
                 ImageClip(str(overlay_path))
                 .with_duration(clip.duration)
                 .with_position((0, 0))
             )
+
             video = CompositeVideoClip([clip, watermark])
+
             try:
                 video.write_videofile(
                     str(output_path),
@@ -98,7 +102,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message: discord.Message):
-    if message.author == bot.user:
+    if message.author.bot:
         return
 
     if not message.attachments:
@@ -113,17 +117,21 @@ async def on_message(message: discord.Message):
     await attachment.save(input_path)
 
     try:
+        await message.delete()
+    except Exception:
+        pass
+
+    try:
         if is_image(safe_name):
             add_watermark_image(input_path, output_path)
         elif is_video(safe_name):
             add_watermark_video(input_path, output_path)
         else:
-            await message.channel.send("File type not supported.")
             return
 
         await message.channel.send(file=discord.File(str(output_path)))
-    except Exception as error:
-        await message.channel.send(f"Error: {error}")
+    except Exception:
+        return
     finally:
         for path in (input_path, output_path):
             if path.exists():
