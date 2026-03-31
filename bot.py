@@ -40,7 +40,7 @@ def create_text_overlay(size: tuple[int, int]) -> Image.Image:
     text_height = bbox[3] - bbox[1]
     position = (width - text_width - padding, height - text_height - padding)
 
-    draw.text(position, WATERMARK_TEXT, font=font, fill=(255, 0, 0, 200))
+    draw.text(position, WATERMARK_TEXT, font=font, fill=(255, 255, 255, 255))
     return overlay
 
 
