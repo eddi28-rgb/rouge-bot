@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -8,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from moviepy import CompositeVideoClip, ImageClip, VideoFileClip
 
 TOKEN = os.environ["DISCORD_TOKEN"]
-WATERMARK_TEXT = "discord.rouge"
+WATERMARK_TEXT = "Discord.gg/rougerooms"
 WORKDIR = Path("discord_bot/temp_files")
 
 intents = discord.Intents.default()
@@ -32,7 +31,12 @@ def create_text_overlay(size: tuple[int, int]) -> Image.Image:
     overlay = Image.new("RGBA", size, (255, 255, 255, 0))
     draw = ImageDraw.Draw(overlay)
 
-    font_size = max(150, width // 3)
+    font_size = max(200, width)
+    font = get_font(font_size)
+    bbox = draw.textbbox((0, 0), WATERMARK_TEXT, font=font)
+    text_width = bbox[2] - bbox[0]
+    if text_width > 0:
+        font_size = int(font_size * (width * 0.95) / text_width)
     font = get_font(font_size)
 
     bbox = draw.textbbox((0, 0), WATERMARK_TEXT, font=font)
