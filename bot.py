@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from moviepy import CompositeVideoClip, ImageClip, VideoFileClip
 
 TOKEN = os.environ["DISCORD_TOKEN"]
-WATERMARK_TEXT = "Discord.gg/rougerooms"
+WATERMARK_TEXT = "EDDI"
 WORKDIR = Path("discord_bot/temp_files")
 
 intents = discord.Intents.default()
